@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module>
+<ModulePrefs title="Wide View Map">
+</ModulePrefs>
+<Content type="html">
+
+  <![CDATA[
+  
+<html>
+
+<head>
+  <!-- EXTERNAL LIBS-->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+  <!-- Key for Sir Charles to have access to the Google Maps API-->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyACTKC8leVHMitlnhsWd6Th2iPJIP8R-dA"></script>
+
+  <title>Simple Map</title>
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+  <style type="text/css">
+    html {
+      height: 100%
+    }
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0
+    }
+    #map-canvas {
+      height: 100%
+    }
+  </style>
+
+
+
+  <script type="text/javascript">
+    function initialize() {
+
+
+      $.getJSON("https://spreadsheets.google.com/feeds/list/1s1pMF_R6ryxcNJarCdeKGX2jjM0vLEQngxStHcD_prU/od6/public/values?alt=json", function(data) {
+
+               
+        var latitudeFromSheet = data.feed.entry[0]['gsx$latitude']['$t'];
+        var longFromSheet = data.feed.entry[0]['gsx$long']['$t'];
+
+
+
+        // Create a Google coordinate object for where to center the map
+        var latlngHedgie = new google.maps.LatLng(latitudeFromSheet, longFromSheet);
+        var latlngStartMileZeroVictoria = new google.maps.LatLng(48.409108, -123.369016);
+        var latlngEndSignalHill = new google.maps.LatLng(47.570029, -52.681364);
+
+
+        var mapOptions = {
+          center: new google.maps.LatLng(48.436137, -85),
+          zoom: 4,
+          scaleControl: true,
+          draggable: false,
+          scrollwheel: false
+        };
+
+
+        var map = new google.maps.Map(document.getElementById("map-canvas"),
+          mapOptions);
+
+
+        var markerNow = new google.maps.Marker(
+        {
+          position: latlngHedgie,
+          map: map,
+          icon: "https://sites.google.com/site/sircharlesruns/GoogleMapsMarker-HedgieEast.png?attredirects=0&d=1",        
+          title: 'Sir Charles is here'
+        });
+
+        //         shadow: pinShadow,
+
+
+        var markerStart = new google.maps.Marker({
+          position: latlngStartMileZeroVictoria,
+          map: map,
+          title: 'Sir Charles started here'
+        });
+
+        var markerEnd = new google.maps.Marker({
+          position: latlngEndSignalHill,
+          map: map,
+          title: 'Sir Charles\'s audacious run finishes here'
+        });
+
+
+        // draw a solid line, from start of run in Victoria, to his present position
+        var VictoriaToNowPath = [
+          latlngStartMileZeroVictoria,
+          latlngHedgie
+        ];
+
+        var runDone = new google.maps.Polyline({
+          path: VictoriaToNowPath,
+          geodesic: false,
+          strokeColor: 'green',
+          strokeOpacity: 1.0,
+          strokeWeight: 4,
+          map: map
+        });
+
+        // draw a dashed line, from his present position, to finish at Signal Hill NFLD
+        var NowToSignalHill = [
+          latlngEndSignalHill,
+          latlngHedgie
+        ];
+
+        // Define a symbol using SVG path notation, with an opacity of 1.
+        var lineSymbol = {
+          path: 'M 0,-1 0,1',
+          strokeOpacity: 1,
+          scale: 4
+        };
+
+
+        var runStillToGo = new google.maps.Polyline({
+          path: NowToSignalHill,
+          strokeOpacity: 0,
+          strokeColor: 'black',
+          strokeWeight: 4,
+          icons: [{
+            icon: lineSymbol,
+            offset: '0',
+            repeat: '20px'
+          }],
+          map: map
+        });
+
+
+      }); // end getJSON
+
+    }
+
+
+    google.maps.event.addDomListener(window, 'load', initialize);
+  </script>
+</head>
+
+<body>
+  <div id="map-canvas" />
+</body>
+
+</html>
+  ]]>
+ </Content>
+</Module>
